@@ -37,12 +37,17 @@
           <!-- File Upload Input -->
           <input type="file" id="fileInput" accept=".docx">
 
+          <!-- Download Button -->
+          <button id="downloadBtn" style="display:none;" onclick="downloadMarkdown()">Download Markdown</button>
+
           <!-- Output Area for Converted Markdown -->
           <h2>Converted Markdown:</h2>
           <pre id="output"></pre>
 
           <!-- Conversion Script -->
           <script>
+            let convertedMarkdown = '';
+
             document.getElementById('fileInput').addEventListener('change', function(event) {
               const file = event.target.files[0];
               if (file) {
@@ -52,8 +57,9 @@
                   mammoth.convertToHtml({arrayBuffer: arrayBuffer})
                     .then(function(result) {
                       const turndownService = new TurndownService();
-                      const markdown = turndownService.turndown(result.value);
-                      document.getElementById('output').textContent = markdown;
+                      convertedMarkdown = turndownService.turndown(result.value);
+                      document.getElementById('output').textContent = convertedMarkdown;
+                      document.getElementById('downloadBtn').style.display = 'block';
                     })
                     .catch(function(error) {
                       console.error('Conversion error: ', error);
@@ -62,6 +68,18 @@
                 reader.readAsArrayBuffer(file);
               }
             });
+
+            function downloadMarkdown() {
+              const blob = new Blob([convertedMarkdown], {type: 'text/markdown'});
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'converted.md';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);  // Clean up the URL object
+            }
           </script>
 
           <h2>README:</h2>
@@ -86,4 +104,3 @@
     </div>
   </body>
 </html>
-
