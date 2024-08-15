@@ -13,6 +13,8 @@
     {% include head-custom.html %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.1/turndown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/12.3.2/markdown-it.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdownlint-browser/0.0.5/markdownlint.min.js"></script>
   </head>
 
   <body>
@@ -31,7 +33,9 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h2>Upload a DOCX file to convert it to Markdown:</h2>
+          <h1>DOCX to Markdown Converter</h1>
+          <p>Upload a DOCX file to convert it to Markdown:</p>
+
           <!-- File Upload Input -->
           <input type="file" id="fileInput" accept=".docx">
 
@@ -42,7 +46,7 @@
           <h2>Converted Markdown:</h2>
           <pre id="output"></pre>
 
-          <!-- Conversion Script -->
+          <!-- Conversion Script with Automatic Correction -->
           <script>
             let convertedMarkdown = '';
 
@@ -56,6 +60,11 @@
                     .then(function(result) {
                       const turndownService = new TurndownService();
                       convertedMarkdown = turndownService.turndown(result.value);
+
+                      // Lint and automatically correct the Markdown
+                      convertedMarkdown = lintAndCorrectMarkdown(convertedMarkdown);
+
+                      // Display the converted (and corrected) Markdown
                       document.getElementById('output').textContent = convertedMarkdown;
                       document.getElementById('downloadBtn').style.display = 'block';
                     })
@@ -66,6 +75,37 @@
                 reader.readAsArrayBuffer(file);
               }
             });
+
+            function lintAndCorrectMarkdown(markdown) {
+              const results = markdownlint.sync({
+                strings: {
+                  content: markdown
+                },
+                config: {
+                  "default": true,
+                  "MD007": false  // Disable indentation rule for lists as an example
+                }
+              });
+
+              // Iterate over the linting results and apply corrections
+              results.content.forEach(issue => {
+                switch (issue.ruleNames[0]) {
+                  case "MD009":  // Trailing spaces
+                    markdown = markdown.replace(/ +$/gm, '');
+                    break;
+                  case "MD018":  // No space after hash on atx style header
+                    markdown = markdown.replace(/^(#+)([^\s#])/gm, '$1 $2');
+                    break;
+                  case "MD022":  // Headers should be surrounded by blank lines
+                    markdown = markdown.replace(/([^\n])\n(#+)/g, '$1\n\n$2');
+                    markdown = markdown.replace(/(#+[^\n]*)\n([^\n#])/g, '$1\n\n$2');
+                    break;
+                  // Add more cases as needed for other rules you want to correct
+                }
+              });
+
+              return markdown;
+            }
 
             function downloadMarkdown() {
               const blob = new Blob([convertedMarkdown], {type: 'text/markdown'});
