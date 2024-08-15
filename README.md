@@ -6,6 +6,8 @@ GitHub Pages site that allows users to upload `.docx` file and convert them to M
 - **Upload and Convert**: Users can upload `.docx` files, which are then converted to Markdown.
 - **Download Markdown**: After conversion, users can download the Markdown file with a single click.
 
+[![](./docs/s01.png)](https://michaelakridge-noaa.github.io/docx2md-web/)
+
 ## How It Works
 1. **Upload a DOCX File**: Click on the "Choose File" button to select a `.docx` file from your computer.
 2. **Conversion**: The file is converted to Markdown using Mammoth.js (for DOCX to HTML) and Turndown.js (for HTML to Markdown).
