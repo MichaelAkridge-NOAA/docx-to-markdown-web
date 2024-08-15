@@ -11,8 +11,8 @@
     <![endif]-->
     {% seo %}
     {% include head-custom.html %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.1/turndown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turndown/7.1.1/turndown.min.js" async></script>
   </head>
 
   <body>
@@ -33,14 +33,17 @@
         <section id="main-content">
           <h2>Upload a DOCX file to convert it to Markdown:</h2>
           <!-- File Upload Input -->
-          <input type="file" id="fileInput" accept=".docx">
+          <input type="file" id="fileInput" accept=".docx" aria-label="Upload a DOCX file">
+
+          <!-- Loading Indicator -->
+          <div id="loadingIndicator" style="display:none;">Processing...</div>
 
           <!-- Download Button -->
-          <button id="downloadBtn" style="display:none;" onclick="downloadMarkdown()">Download Markdown</button>
+          <button id="downloadBtn" style="display:none;" onclick="downloadMarkdown()" aria-label="Download converted markdown file">Download Markdown</button>
 
           <!-- Output Area for Converted Markdown -->
           <h2>Converted Markdown:</h2>
-          <pre id="output"></pre>
+          <pre id="output" style="background-color: #f4f4f4; padding: 10px; border-radius: 5px;"></pre>
 
           <!-- Conversion Script -->
           <script>
@@ -48,7 +51,14 @@
 
             document.getElementById('fileInput').addEventListener('change', function(event) {
               const file = event.target.files[0];
+              
+              if (file.type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                alert('Please upload a valid DOCX file.');
+                return;
+              }
+
               if (file) {
+                document.getElementById('loadingIndicator').style.display = 'block';
                 const reader = new FileReader();
                 reader.onload = function(event) {
                   const arrayBuffer = event.target.result;
@@ -58,9 +68,12 @@
                       convertedMarkdown = turndownService.turndown(result.value);
                       document.getElementById('output').textContent = convertedMarkdown;
                       document.getElementById('downloadBtn').style.display = 'block';
+                      document.getElementById('loadingIndicator').style.display = 'none';
                     })
                     .catch(function(error) {
                       console.error('Conversion error: ', error);
+                      document.getElementById('output').textContent = 'Error: Conversion failed. Please check your file and try again.';
+                      document.getElementById('loadingIndicator').style.display = 'none';
                     });
                 };
                 reader.readAsArrayBuffer(file);
