@@ -1,4 +1,4 @@
-# DOCX to Markdown (DOCX2MD) Web Converter
+# DOCX to Markdown Converter | Github Pages
 
 GitHub Pages site that allows users to upload `.docx` file and convert them to Markdown (`.md`). The site uses JavaScript libraries Mammoth.js and Turndown.js to perform the conversion directly in the browser.
 ### - https://michaelakridge-noaa.github.io/docx-to-md-web/
