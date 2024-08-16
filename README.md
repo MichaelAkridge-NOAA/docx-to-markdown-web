@@ -20,6 +20,7 @@ This site is hosted on GitHub Pages. Simply visit the site, upload your `.docx` 
 
 ## Credits / Libraries Used
 
+- [Architect Jekyll Theme](https://github.com/pages-themes/architect): for GitHub Pages
 - [Mammoth.js](https://github.com/mwilliamson/mammoth.js): Converts `.docx` files to HTML.
 - [Turndown.js](https://github.com/domchristie/turndown): Converts HTML to Markdown.
 
